@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
 
     'account',
+    'tempinfo'
 ]
 
 MIDDLEWARE = [
@@ -92,10 +93,10 @@ ASGI_APPLICATION = "skincare.asgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv('DB_NAME', 'skincare'),
-        "USER": os.getenv('DB_USER', 'myuser'),
-        "PASSWORD": os.getenv('DB_PASSWORD', 'MDriadhossen1@'),
-        "HOST": os.getenv('DB_HOST', 'db'),
+        "NAME": os.getenv('DB_NAME'),
+        "USER": os.getenv('DB_USER'),
+        "PASSWORD": os.getenv('DB_PASSWORD'),
+        "HOST": os.getenv('DB_HOST'),
         "PORT": os.getenv('DB_PORT', '5432'),
     }
 }
