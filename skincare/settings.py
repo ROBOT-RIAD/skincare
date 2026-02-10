@@ -30,7 +30,12 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["api.glowmi.net",]
+CSRF_TRUSTED_ORIGINS = [
+    "https://api.glowmi.net",
+    # add more if needed, e.g.
+    # "https://www.api.glowmi.net",
+]
 
 
 # Application definition
