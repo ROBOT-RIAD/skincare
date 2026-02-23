@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import TempInfoCollect
 from datetime import date
-
+from utils import send_temp_info_email
 
 class TempInfoCollectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,6 +32,7 @@ class TempInfoCollectSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         instance = TempInfoCollect.objects.create(**validated_data)
+        send_temp_info_email(instance)
         return instance
     
     def update(self, instance, validated_data):
