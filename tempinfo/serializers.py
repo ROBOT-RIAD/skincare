@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import TempInfoCollect
 from datetime import date
-from utils import send_temp_info_email
+from .utils import send_temp_info_email
 
 class TempInfoCollectSerializer(serializers.ModelSerializer):
     class Meta:
