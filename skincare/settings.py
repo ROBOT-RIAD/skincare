@@ -30,7 +30,8 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["api.glowmi.net",]
+ALLOWED_HOSTS = ["api.glowmi.net","localhost"]
+
 CSRF_TRUSTED_ORIGINS = [
     "https://api.glowmi.net",
     # add more if needed, e.g.
@@ -217,12 +218,12 @@ SIMPLE_JWT = {
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.office365.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv("EMAIL")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD")
-DEFAULT_FROM_EMAIL = os.getenv("EMAIL", "riadhosain420@gmail.com")
+DEFAULT_FROM_EMAIL = os.getenv("EMAIL")
 
 
 
