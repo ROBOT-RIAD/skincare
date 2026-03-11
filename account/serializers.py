@@ -3,7 +3,7 @@ from account.models import User,Profile,PasswordReserOTP
 from datetime import date
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth import password_validation
-from .tasks import send_otp_email
+from .tasks import send_otp_email,send_welcome_email
 
 
 #jwt 
@@ -15,9 +15,10 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 #Register serializer
 
 class RegisterSerializer(serializers.ModelSerializer):
-
     full_name = serializers.CharField(max_length=200,required=False,allow_blank=True,allow_null=True)
     gender = serializers.CharField(max_length=50,required=False,allow_blank=True,allow_null=True)
+    contact_number = serializers.CharField(max_length=20, required=False, allow_blank=True, allow_null=True)
+    skin_type = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
     date_of_birth = serializers.DateField(required=False,allow_null=True)
     image = serializers.ImageField(required=False,allow_null=True)
 
@@ -26,7 +27,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email' , 'password' , 'full_name' , 'gender' , 'date_of_birth','image']
+        fields = ['email' , 'password' , 'full_name' , 'gender' ,"contact_number", 'date_of_birth',"skin_type",'image']
         extra_kwargs = {'password':{'write_only':True}}
     
 
@@ -36,6 +37,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         full_name = attrs.get("full_name")
         gender = attrs.get("gender")
         date_of_birth = attrs.get("date_of_birth")
+        contact_number = attrs.get("contact_number")
+        skin_type = attrs.get("skin_type")
         image = attrs.get("image")
 
 
@@ -62,14 +65,42 @@ class RegisterSerializer(serializers.ModelSerializer):
                     "date_of_birth": "Date of birth must be in the past."
                 })
             
+        if contact_number:
+            phone = contact_number.strip()
+            if not phone.startswith("+"):
+                raise serializers.ValidationError({"contact_number": "Phone number must start with a country code (e.g., +1, +44, +880)."})
+            
+            digits = phone[1:]
+            if not digits.isdigit():
+                raise serializers.ValidationError({"contact_number": "Phone number must contain digits only after the country code."})
+
+            country_code = digits[:3]
+            if len(country_code) < 1:
+                raise serializers.ValidationError({"contact_number": "Invalid country code."})
+
+            number_part = digits[len(country_code):]
+            if len(number_part) < 6:
+                raise serializers.ValidationError({"contact_number": "Phone number must contain a valid number after the country code (minimum 6 digits)."})
+
+            if not (8 <= len(digits) <= 20):
+                raise serializers.ValidationError({"contact_number": "Phone number must be 8–20 digits (excluding +)."})
+            
+        if skin_type:
+            if not isinstance(skin_type, str):
+                raise serializers.ValidationError({
+                    "skin_type": "Skin type must be a string."
+                })
+            
         return attrs
     
 
     def create(self, validated_data):
-        full_name = validated_data.pop('full_name',None)
-        gender = validated_data.pop('gender',None)
-        date_of_birth = validated_data.pop('date_of_birth',None)
-        image = validated_data.pop('image',None)
+        full_name = validated_data.pop("full_name", None)
+        gender = validated_data.pop("gender", None)
+        contact_number = validated_data.pop("contact_number", None)
+        skin_type = validated_data.pop("skin_type", None)
+        date_of_birth = validated_data.pop("date_of_birth", None)
+        image = validated_data.pop("image", None)
 
 
         email = validated_data.pop('email',None)
@@ -77,19 +108,23 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         user = User.objects.create_user(
             email = email,
-            username=email,
+            username=User().generate_unique_username(),
             password = password
         )
 
         profile = Profile.objects.create(
-            user = user,
-            full_name = full_name,
-            gender = gender,
-            date_of_birth = date_of_birth,
-            image = image
+            user=user,
+            full_name=full_name,
+            gender=gender,
+            contact_number=contact_number,
+            skin_type=skin_type,
+            date_of_birth=date_of_birth,
+            image=image
         )
 
-        return user , profile
+        send_welcome_email.delay(user.id)
+
+        return user
 
 
 
@@ -125,10 +160,13 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['user'] = {
             'id': user.id,
             'email': user.email,
+            'membership_Id': user.username,
             'role': user.role,
             'full_name': profile.full_name if profile.full_name else None,
             'gender': profile.gender if profile.gender else None,
             'date_of_birth': profile.date_of_birth if profile.date_of_birth else None,
+            "contact_number":profile.contact_number if profile.contact_number else None,
+            "skin_type": profile.skin_type if profile.skin_type else None,
             'image': profile.image.url if profile.image else None,
         }
 
@@ -185,8 +223,8 @@ class SendOTPSerializer(serializers.Serializer):
     def save(self):
         email = self.validated_data["email"]
         user = User.objects.get(email=email)
-        otp_obj = PasswordReserOTP.objects.create(user=user)
-        send_otp_email.delay(user.id, otp_obj.otp)
+        otp_obj = PasswordReserOTP.objects.create(user=user)   
+        send_otp_email.delay(user.id, otp_obj.otp)    
         return otp_obj
 
 

@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import RegisterView,LoginAPIView,CustomTokenRefresView,ChangePasswordApiView,ForgetPasswordSendOTP, ForgetPasswordVerifyOTP, ForgetPasswordReset ,ProfileAPIView
 
-from tempinfo.views import TempInfoListCreateAPIView,TempInfoRetrieveUpdateDeleteAPIView
+
 
 
 urlpatterns = [
@@ -19,13 +19,5 @@ urlpatterns = [
 
     #profile
     path('profile/', ProfileAPIView.as_view(), name='profile'),
-
-    path("temp-info/",TempInfoListCreateAPIView.as_view(),name="tempinfo-list-create"),
-    path('temp-info/<int:id>/', TempInfoRetrieveUpdateDeleteAPIView.as_view()),
-
-
-
-
-
 
 ]

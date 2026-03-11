@@ -55,10 +55,13 @@ class RegisterView(APIView):
                                     properties={
                                         "id": openapi.Schema(type=openapi.TYPE_INTEGER),
                                         "email": openapi.Schema(type=openapi.TYPE_STRING),
+                                        "membership_Id": openapi.Schema(type=openapi.TYPE_STRING),
                                         "role": openapi.Schema(type=openapi.TYPE_STRING),
                                         "full_name": openapi.Schema(type=openapi.TYPE_STRING),
                                         "gender": openapi.Schema(type=openapi.TYPE_STRING),
                                         "date_of_birth": openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE),
+                                        "contact_number": openapi.Schema(type=openapi.TYPE_STRING),
+                                        "skin_type": openapi.Schema(type=openapi.TYPE_STRING),
                                         "image": openapi.Schema(type=openapi.TYPE_STRING),
                                     }
                                 ),
@@ -75,7 +78,8 @@ class RegisterView(APIView):
         lean = request.query_params.get('lean', 'EN').upper()
         serializer = RegisterSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        user , profile= serializer.save()
+        user = serializer.save()
+        profile = user.profile
         refresh = RefreshToken.for_user(user)
         refresh['id'] = user.id
         refresh['email'] = user.email
@@ -84,20 +88,24 @@ class RegisterView(APIView):
         access_token = str(refresh.access_token)
 
         data={
-                'access_token': access_token,
-                'refresh_token': str(refresh), 
+                'refresh': str(refresh), 
+                'access': access_token,
                 'user': {
                     'id' : user.id,
                     'email': user.email,
+                    "membership_Id":user.username,
                     'role': user.role,
                     'full_name': profile.full_name if profile.full_name else "",
                     'gender': profile.gender if profile.gender else "",
                     'date_of_birth': profile.date_of_birth if profile.date_of_birth else None,
+                    "contact_number":profile.contact_number if profile.contact_number else None,
+                    "skin_type":profile.skin_type if profile.skin_type else None,
                     'image': profile.image.url if profile.image else "",
                 }
             }
         return success_response(message="User registerd successfully",data=data,status_code=status.HTTP_201_CREATED)
-
+    
+    
 
 
 #Token view
