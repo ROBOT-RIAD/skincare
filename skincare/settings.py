@@ -57,6 +57,11 @@ INSTALLED_APPS = [
     'django_filters',
     'django_celery_beat',
     'account',
+    'category',
+    'adminapi',
+    'userapi',
+    'notifications',
+    'product'
 ]
 
 MIDDLEWARE = [
@@ -181,7 +186,7 @@ REST_FRAMEWORK = {
 
 #Swagger 
 SWAGGER_SETTINGS = {
-    # 'DEFAULT_API_URL': 'https://api.trusttaste.ai',
+    'DEFAULT_API_URL': 'https://api.trusttaste.ai',
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
@@ -256,4 +261,8 @@ DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 DB_NAME = os.getenv('DB_NAME')
+
+
+
+GIMINIAPI_KEY = os.getenv('GIMINIAPI_KEY')
 

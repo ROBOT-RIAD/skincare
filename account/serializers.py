@@ -95,12 +95,14 @@ class RegisterSerializer(serializers.ModelSerializer):
     
 
     def create(self, validated_data):
+        request = self.context.get("request")
         full_name = validated_data.pop("full_name", None)
         gender = validated_data.pop("gender", None)
         contact_number = validated_data.pop("contact_number", None)
         skin_type = validated_data.pop("skin_type", None)
         date_of_birth = validated_data.pop("date_of_birth", None)
         image = validated_data.pop("image", None)
+        lean = request.query_params.get('lean', 'EN').upper() if request else "EN"
 
 
         email = validated_data.pop('email',None)
@@ -122,7 +124,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             image=image
         )
 
-        send_welcome_email.delay(user.id)
+        send_welcome_email.delay(user.id, lean)
 
         return user
 

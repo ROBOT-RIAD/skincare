@@ -76,7 +76,7 @@ class RegisterView(APIView):
 
     def post(self , request , *args,**kwargs):
         lean = request.query_params.get('lean', 'EN').upper()
-        serializer = RegisterSerializer(data = request.data)
+        serializer = RegisterSerializer(data = request.data,context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         profile = user.profile
