@@ -186,7 +186,7 @@ REST_FRAMEWORK = {
 
 #Swagger 
 SWAGGER_SETTINGS = {
-    'DEFAULT_API_URL': 'https://api.trusttaste.ai',
+    'DEFAULT_API_URL': 'https://api.glowmi.net/',
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
