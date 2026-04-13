@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ["api.glowmi.net","localhost"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://api.glowmi.net",
+    "https://api.glowmi.net/",
     # add more if needed, e.g.
     # "https://www.api.glowmi.net",
 ]
