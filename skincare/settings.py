@@ -188,6 +188,7 @@ REST_FRAMEWORK = {
 #Swagger 
 SWAGGER_SETTINGS = {
     'DEFAULT_API_URL': 'https://api.glowmi.net/',
+    'SCHEMES': ['https'],
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
